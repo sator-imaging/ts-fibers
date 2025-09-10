@@ -27,11 +27,6 @@
 
 `ts-fibers` provides two primary factory methods for creating Fibers instances: `Fibers.forEach` for array enumeration and `Fibers.for` for sequential operations.
 
-```bash
-# 🚀 Installation
-npm install ts-fiber
-```
-
 
 ## Array Enumeration (`Fibers.forEach`)
 
@@ -178,7 +173,7 @@ fibers.promise
   .catch(...)
   .finally(...);
 
-// Start the fiber
+// Start the fibers
 const startPromise = fibers.start();
   // *startPromise will be resolved on stop() or when fibers is completed
   // ie. `await fibers.start()` is same to `await fibers.promise`
@@ -194,7 +189,7 @@ await stopPromise;
 fibers.start();
 await fibers.promise;
   // Note: There is a fail-safe property '.promiseStart' that will invoke start()
-  // automatically to avoid an indefinitely loop caused by awaiting a stopped fiber
+  // automatically to avoid an indefinitely loop caused by awaiting a stopped fibers
 
 // promise callbacks are invoked!!
 ```
