@@ -1,4 +1,6 @@
 [![npm](https://img.shields.io/npm/v/ts-fibers.svg)](https://www.npmjs.com/package/ts-fibers)
+&nbsp;
+[![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sator-imaging/ts-fibers)
 
 
 
