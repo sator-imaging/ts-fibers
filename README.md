@@ -4,7 +4,7 @@
 
 
 
-# ts-fibers: Microthreading for TypeScript
+# `ts-fibers`: Microthreading for TypeScript
 
 `ts-fibers` is a powerful and efficient coroutine/microthreading library for TypeScript, designed to help you manage asynchronous operations and long-running tasks without causing CPU usage spikes or excessive memory allocation. It leverages TypeScript's `Generator` and `AsyncGenerator` features to provide fine-grained control over task execution, making your applications more responsive and resource-friendly.
 
