@@ -6,8 +6,8 @@ export interface FiberTaskFactory<TSource, TPromise> {
 export type FiberErrorHandler<TSource, TValue> = (
   e: any,
   fibers: Fibers<TSource, TValue>,
-  reason: 'next' | 'unknown')
-  =>
+  reason: 'next' | 'unknown'
+) =>
   'stop' | 'skip' | 'default';
 
 export class FiberError extends Error {
