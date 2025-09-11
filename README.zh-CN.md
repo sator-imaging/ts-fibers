@@ -1,4 +1,5 @@
 [![npm](https://img.shields.io/npm/v/ts-fibers.svg)](https://www.npmjs.com/package/ts-fibers)
+[![npm-publish](https://github.com/sator-imaging/ts-fibers/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/sator-imaging/ts-fibers/actions/workflows/npm-publish.yml)
 &nbsp;
 [![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sator-imaging/ts-fibers)
 
