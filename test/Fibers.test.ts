@@ -500,7 +500,7 @@ describe('Fibers error handling', () => {
     const promiseCatch = fibers.promise.catch((e) => {
       expect(e).toBeInstanceOf(Error);
       expect(e.message).toBe('Test error - default');
-      console.log('Test error - default (catch)');
+      // console.log('Test error - default (catch)');
     });
     const promise = (async () => {
       for await (const result of fibers) {
@@ -543,7 +543,7 @@ describe('Fibers error handling', () => {
     const promiseCatch = fibers.promise.catch((e) => {
       expect(e).toBeInstanceOf(Error);
       expect(e.message).toBe('Test error - no handler');
-      console.log('Test error - no handler (catch)');
+      // console.log('Test error - no handler (catch)');
     });
     const promise = (async () => {
       try {
