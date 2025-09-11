@@ -2,6 +2,14 @@
 &nbsp;
 [![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sator-imaging/ts-fibers)
 
+[🇺🇸 English](./README.md)
+&nbsp; ❘ &nbsp;
+[🇯🇵 日本語版](./README.ja.md)
+&nbsp; ❘ &nbsp;
+[🇨🇳 简体中文版](./README.zh-CN.md)
+
+
+
 
 
 # `ts-fibers`: Microthreading for TypeScript
@@ -163,9 +171,7 @@ Fibers instances provide a `Promise<void>` handle via the `.promise` property, a
 ```ts
 import { Fibers } from 'ts-fibers';
 
-const fibers = Fibers.for(concurrency, startIndex, endIndex, step, async (index) => {
-  return await fooAsync(index);
-});
+const fibers = Fibers.for(...);
 
 // Register callbacks for the fibers' lifecycle
 fibers.promise
@@ -175,12 +181,12 @@ fibers.promise
 
 // Start the fibers
 const startPromise = fibers.start();
-  // *startPromise will be resolved on stop() or when fibers is completed
+  // startPromise will be resolved on stop() or when fibers is completed
   // ie. `await fibers.start()` is same to `await fibers.promise`
 
 // When stopped, of course, promise callbacks are NOT invoked
 const stopPromise = fibers.stop();
-  // *stopPromise will be resolved when currently-queued fibers tasks are completed
+  // stopPromise will be resolved when currently-queued fibers tasks are completed
 
 // If you don't await, tasks may still be running in the background
 await stopPromise;
@@ -237,7 +243,7 @@ const ac = new AbortController();
 console.log('Starting a 5-second timer, but will abort after 1 second...');
 
 const timer = Fibers.delay(5000, ac);
-timer.promise.finally(() => console.log('finished or aborted'));
+timer.finally(() => console.log('finished or aborted'));
 
 setTimeout(() => {
   ac.abort();  // Stop timer immediately!
