@@ -14,7 +14,7 @@
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "target": "es2021",
-    "sourceMap": false,
+    "sourceMap": true,
     // recommended
     "strict": true,
     "noImplicitAny": true,

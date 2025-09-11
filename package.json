@@ -28,6 +28,7 @@
     "test": "vitest --run",
     "build": "tsc && rollup -c"
   },
+  "type": "module",
   "files": [
     "dist"
   ],
