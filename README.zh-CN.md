@@ -15,7 +15,7 @@
 
 # `ts-fibers`：TypeScript 微线程库
 
-`ts-fibers` 是一个强大且高效的 TypeScript 协程/微线程库，旨在帮助您管理异步操作和长时间运行的任务，同时避免 CPU 使用率飙升或过多的内存分配。它利用 TypeScript 的 `Generator` 和 `AsyncGenerator` 特性，对任务执行提供精细控制，使您的应用程序响应更迅速，资源更友好。
+`ts-fibers` 是一个强大且高效的 TypeScript **协程/微线程库**，旨在帮助您管理异步操作和长时间运行的任务，同时避免 CPU 使用率飙升或过多的内存分配。它利用 TypeScript 的 `Generator` 和 `AsyncGenerator` 特性，对任务执行提供精细控制，使您的应用程序响应更迅速，资源更友好。
 
 
 ## ✨ 主要特性

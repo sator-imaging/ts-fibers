@@ -191,8 +191,9 @@ export class Fibers<TSource, TValue>
         }
 
         // ok, take finished task.
-        activeTask = finishedPool.values().next().value;
-        if (activeTask !== undefined) {
+        const finishedTask = finishedPool.values().next().value;
+        if (finishedTask !== undefined) {
+          activeTask = finishedTask;
           return { value: await activeTask, done: false };
         }
       }
