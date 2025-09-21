@@ -31,6 +31,8 @@ export class Fibers<TSource, TValue>
   private _isCompleted = false;
   private _isFailed = false;
   private _isResolvedOrRejected = false;
+  // start/stop flag is required to allow stop() to return active promise while stopping fibers.
+  // ie., activeJob === undefined cannot be used in start()/stop() to determine fiber is started or not.
   private _allowBackgroundJobRunning = false;
   private _activeBackgroundJob: Promise<void> | undefined;
 
@@ -95,28 +97,28 @@ export class Fibers<TSource, TValue>
   public get completed(): boolean { return this._isCompleted; };
 
   private async _runInBackground(): Promise<void> {
-    do { }
-    while (
-      this._allowBackgroundJobRunning &&
-      !this._isFailed &&
-      !this._isCompleted &&
-      !(await this._nextCore()).done
-    );
-
-    // update state for next start() call.
-    this.stop();
-
-    // and clear active job here.
-    this._activeBackgroundJob = undefined;
+    try {
+      do { }
+      while (
+        this._allowBackgroundJobRunning &&
+        !this._isFailed &&
+        !this._isCompleted &&
+        !(await this._nextCore()).done
+      );
+    }
+    finally {
+      this._allowBackgroundJobRunning = false;
+      this._activeBackgroundJob = undefined;
+    }
   }
 
   public start(): Promise<void> {
-    if (this._activeBackgroundJob !== undefined) {
-      return this._activeBackgroundJob;
-    }
-
     if (this._isCompleted || this._isFailed) {
       return Promise.resolve();
+    }
+
+    if (this._activeBackgroundJob !== undefined) {
+      return this._activeBackgroundJob;
     }
 
     this._allowBackgroundJobRunning = true;
@@ -126,11 +128,11 @@ export class Fibers<TSource, TValue>
   public stop(): Promise<void> {
     this._allowBackgroundJobRunning = false;
 
-    if (this._activeBackgroundJob === undefined) {
-      return Promise.resolve();
+    if (this._activeBackgroundJob !== undefined) {
+      return this._activeBackgroundJob;
     }
 
-    return this._activeBackgroundJob;
+    return Promise.resolve();
   }
 
   /// impl of AsyncGenerator ///////
