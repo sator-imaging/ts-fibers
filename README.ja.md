@@ -204,7 +204,7 @@ await fibers.promise;
 
 ## `start()`と`for await...of`の制限
 
-Fibersインスタンスで`start()`が呼び出されると、同じインスタンスで`for await...of`を使用しようとすると、fibersが完了するか明示的に停止されるまで`FiberError`がスローされます。逆に、`for await...of`ループ内で`start()`を呼び出してもすぐにスローされませんが、その後の`for await...of`イテレーションは失敗します。
+Fibersインスタンスで`start()`が呼び出されると、同じインスタンスで`for await...of`を使用しようとすると、fibersが完了するか明示的に停止されるまで`FiberError`がスローされます。逆に、`for await...of`ループ内で`start()`を呼び出しても`FiberError`がスローされます。
 
 ```ts
 import { Fibers, FiberError } from 'ts-fibers';
@@ -217,8 +217,7 @@ for await (const result of fibers) { } // FiberErrorをスロー
 
 // シナリオ2: for await...of内でstart()を呼び出す
 for await (const result of fibers) {
-  // fibersが開始されたため、その後の'for await...of'のイテレーションは失敗します
-  fibers.start(); // これはすぐにスローされません
+  fibers.start(); // FiberErrorをスロー
 }
 ```
 

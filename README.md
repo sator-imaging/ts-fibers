@@ -204,7 +204,7 @@ await fibers.promise;
 
 ## `start()` and `for await...of` Limitations
 
-Once `start()` is called on a Fibers instance, attempting to use `for await...of` on the same instance will throw a `FiberError` until the fibers is completed or explicitly stopped. Conversely, calling `start()` within a `for await...of` loop will not throw immediately but will cause subsequent `for await...of` iterations to fail.
+Once `start()` is called on a Fibers instance, attempting to use `for await...of` on the same instance will throw a `FiberError` until the fibers is completed or explicitly stopped. Conversely, calling `start()` within a `for await...of` loop will throw a `FiberError` too.
 
 ```ts
 import { Fibers, FiberError } from 'ts-fibers';
@@ -217,8 +217,7 @@ for await (const result of fibers) { } // Throws FiberError
 
 // Scenario 2: Calling start() inside for await...of
 for await (const result of fibers) {
-  // Subsequent iterations of 'for await...of' will fail due to the fibers being started
-  fibers.start(); // This won't throw immediately
+  fibers.start(); // Throws FiberError
 }
 ```
 

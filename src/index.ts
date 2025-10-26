@@ -29,12 +29,14 @@ export class Fibers<TSource, TValue>
   private readonly _generator: Generator<FiberTaskFactory<TSource, TValue>>;
 
   private _isCompleted = false;
-  private _isFailed = false;
-  private _isResolvedOrRejected = false;
+  private _isGeneratorConsuming = false;
   // start/stop flag is required to allow stop() to return active promise while stopping fibers.
   // ie., activeJob === undefined cannot be used in start()/stop() to determine fiber is started or not.
   private _allowBackgroundJobRunning = false;
   private _activeBackgroundJob: Promise<void> | undefined;
+
+  private _isFailed = false;
+  private _isResolvedOrRejected = false;
 
   // for callback receivers: fibers.promise.then(() => ...);
   private _fibersPromise: Promise<void>;
@@ -103,7 +105,7 @@ export class Fibers<TSource, TValue>
         this._allowBackgroundJobRunning &&
         !this._isFailed &&
         !this._isCompleted &&
-        !(await this._nextCore()).done
+        !(await this.next()).done
       );
     }
     finally {
@@ -113,6 +115,10 @@ export class Fibers<TSource, TValue>
   }
 
   public start(): Promise<void> {
+    if (this._isGeneratorConsuming) {
+      throw new FiberError("Cannot start while iterating over fibers");
+    }
+
     if (this._isCompleted || this._isFailed) {
       return Promise.resolve();
     }
@@ -138,14 +144,6 @@ export class Fibers<TSource, TValue>
   /// impl of AsyncGenerator ///////
 
   async next(...[__value_not_used]: [] | [any]): Promise<IteratorResult<TValue, any>> {
-    if (this._activeBackgroundJob !== undefined) {
-      throw new FiberError('Cannot iterate while generator is running in background');
-    }
-
-    return this._nextCore(__value_not_used);
-  }
-
-  private async _nextCore(...[__value_not_used]: [] | [any]): Promise<IteratorResult<TValue, any>> {
     // NOTE: async generator WON'T automatically call 'return method' (succeeded pass) on loop exit.
     //       --> return method is invoked only when break or return is called in caller site.
     //       --> i.e., return method cannot be used for resource cleanup. (or need to call explicitly)
@@ -230,12 +228,13 @@ export class Fibers<TSource, TValue>
       return { value: undefined, done: true };
     }
     else {
-      return this._nextCore(__value_not_used);
+      return this.next(__value_not_used);
     }
   }
 
   private _cleanup(): PromiseLike<void> {
     this._isCompleted = true;
+    this._isGeneratorConsuming = false;
 
     this._allowBackgroundJobRunning = false;
     this._activeBackgroundJob = undefined;
@@ -279,6 +278,12 @@ export class Fibers<TSource, TValue>
   /// AsyncGenerator Requirements ///////
 
   [Symbol.asyncIterator](): AsyncGenerator<TValue, any, any> {
+    if (this._activeBackgroundJob !== undefined) {
+      throw new FiberError('Cannot iterate while generator is running in background');
+    }
+
+    this._isGeneratorConsuming = true;
+
     return this;
   }
 

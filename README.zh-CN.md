@@ -204,7 +204,7 @@ await fibers.promise;
 
 ## `start()` 和 `for await...of` 的限制
 
-一旦在 Fibers 实例上调用 `start()`，尝试在同一实例上使用 `for await...of` 将抛出 `FiberError`，直到 fibers 完成或明确停止。相反，在 `for await...of` 循环中调用 `start()` 不会立即抛出，但会导致后续的 `for await...of` 迭代失败。
+一旦在 Fibers 实例上调用 `start()`，尝试在同一实例上使用 `for await...of` 将抛出 `FiberError`，直到 fibers 完成或明确停止。相反，在 `for await...of` 循环中调用 `start()` 也会抛出 `FiberError`。
 
 ```ts
 import { Fibers, FiberError } from 'ts-fibers';
@@ -217,8 +217,7 @@ for await (const result of fibers) { } // 抛出 FiberError
 
 // 场景 2：在 for await...of 内部调用 start()
 for await (const result of fibers) {
-  // 由于 fibers 已启动，后续的 'for await...of' 迭代将失败
-  fibers.start(); // 这不会立即抛出
+  fibers.start(); // 抛出 FiberError
 }
 ```
 

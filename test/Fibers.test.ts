@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { Fibers } from '../src/index';
+import { FiberError, Fibers } from '../src/index';
 
 describe('Fibers.delay', () => {
   it('should resolve after the specified milliseconds', async () => {
@@ -44,36 +44,36 @@ describe('Fibers.delay', () => {
 describe('Fibers concurrency level validation', () => {
   it('should throw an error if concurrency level is 0 for Fibers.for', () => {
     const factory = async (index: number) => index;
-    expect(() => Fibers.for(0, 0, 1, 1, factory)).toThrow('Concurrency level must be greater than 0');
+    expect(() => Fibers.for(0, 0, 1, 1, factory)).toThrow(new FiberError('Concurrency level must be greater than 0: 0'));
   });
 
   it('should throw an error if concurrency level is negative for Fibers.for', () => {
     const factory = async (index: number) => index;
-    expect(() => Fibers.for(-1, 0, 1, 1, factory)).toThrow('Concurrency level must be greater than 0');
+    expect(() => Fibers.for(-1, 0, 1, 1, factory)).toThrow(new FiberError('Concurrency level must be greater than 0: -1'));
   });
 
   it('should throw an error if concurrency level is 0 for Fibers.forEach', () => {
     const items = ['a'];
     const factory = async (item: string) => item;
-    expect(() => Fibers.forEach(0, items, factory)).toThrow('Concurrency level must be greater than 0');
+    expect(() => Fibers.forEach(0, items, factory)).toThrow(new FiberError('Concurrency level must be greater than 0: 0'));
   });
 
   it('should throw an error if concurrency level is negative for Fibers.forEach', () => {
     const items = ['a'];
     const factory = async (item: string) => item;
-    expect(() => Fibers.forEach(-1, items, factory)).toThrow('Concurrency level must be greater than 0');
+    expect(() => Fibers.forEach(-1, items, factory)).toThrow(new FiberError('Concurrency level must be greater than 0: -1'));
   });
 
   it('should throw an error if concurrency level is set to 0 after instantiation', () => {
     const factory = async (index: number) => index;
     const fibers = Fibers.for(1, 0, 1, 1, factory);
-    expect(() => { fibers.concurrency = 0; }).toThrow('Concurrency level must be greater than 0');
+    expect(() => { fibers.concurrency = 0; }).toThrow(new FiberError('Concurrency level must be greater than 0: 0'));
   });
 
   it('should throw an error if concurrency level is set to negative after instantiation', () => {
     const factory = async (index: number) => index;
     const fibers = Fibers.for(1, 0, 1, 1, factory);
-    expect(() => { fibers.concurrency = -1; }).toThrow('Concurrency level must be greater than 0');
+    expect(() => { fibers.concurrency = -1; }).toThrow(new FiberError('Concurrency level must be greater than 0: -1'));
   });
 
   it('should validate value after setting concurrency level', () => {
@@ -198,7 +198,7 @@ describe('Fibers.for', () => {
         // This should throw an error
       }
     })();
-    await expect(promise).rejects.toThrow('Cannot iterate while generator is running in background');
+    await expect(promise).rejects.toThrow(new FiberError('Cannot iterate while generator is running in background'));
 
     // After the error, the fibers should be completed and failed
     await fibers.promise;
@@ -228,7 +228,7 @@ describe('Fibers.for', () => {
         expect(fibers.started).toBe(true);
       }
     })();
-    await expect(promise).rejects.toThrow('Cannot iterate while generator is running in background');
+    await expect(promise).rejects.toThrow(new FiberError('Cannot start while iterating over fibers'));
 
     // After the error, the fibers should be completed and failed
     await fibers.promise;
@@ -349,7 +349,7 @@ describe('Fibers.forEach', () => {
         // This should throw an error
       }
     })();
-    await expect(promise).rejects.toThrow('Cannot iterate while generator is running in background');
+    await expect(promise).rejects.toThrow(new FiberError('Cannot iterate while generator is running in background'));
 
     // After the error, the fibers should be completed and failed
     await fibers.promise;
@@ -380,7 +380,7 @@ describe('Fibers.forEach', () => {
         expect(fibers.started).toBe(true);
       }
     })();
-    await expect(promise).rejects.toThrow('Cannot iterate while generator is running in background');
+    await expect(promise).rejects.toThrow(new FiberError('Cannot start while iterating over fibers'));
 
     // After the error, the fibers should be completed and failed
     await fibers.promise;
