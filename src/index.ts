@@ -17,6 +17,19 @@ export class FiberError extends Error {
   }
 }
 
+/*
+  TODO: make Fibers thenable(awaitable) by adding then() method
+        --> `await fibers` to start fibers automatically before returning promise
+        --> obsolete .promiseStart
+
+  then<TResult1 = T, TResult2 = never>(
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+  ): Promise<TResult1 | TResult2>;
+
+  * no change introduced since first available: lib.es2015.promise.d.ts
+
+*/
 export class Fibers<TSource, TValue>
   // error even if code is valid...? --> // extends Promise<void>
   implements AsyncGenerator<TValue> {
