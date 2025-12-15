@@ -20,7 +20,7 @@ export class FiberError extends Error {
 /*
   TODO: make Fibers thenable(awaitable) by adding then() method
         --> `await fibers` to start fibers automatically before returning promise
-        --> obsolete .promiseStart
+        --> obsolete .promiseStart property (mark with deprecated tag)
 
   then<TResult1 = T, TResult2 = never>(
     onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
