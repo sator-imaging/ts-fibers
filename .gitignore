@@ -1,7 +1,18 @@
-.*
-node_modules
-dist
+/*
+!src
+!test
 
+.*
 !.github
 !.gitignore
 !.npmignore
+
+*.txt
+*.md
+!README.md
+!README.*.md
+!LICENSE.md
+
+!package.json
+!package-lock.json
+!rollup.config.js
