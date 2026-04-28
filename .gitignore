@@ -1,18 +1,19 @@
+.*
 /*
+
+!.github
 !src
 !test
 
-.*
-!.github
 !.gitignore
 !.npmignore
 
 *.txt
 *.md
-!README.md
-!README.*.md
+!README*.md
 !LICENSE.md
+!CHANGELOG.md
 
-!package.json
-!package-lock.json
+!package*.json
 !rollup.config.js
+!tsconfig.json
