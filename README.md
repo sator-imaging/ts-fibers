@@ -165,7 +165,7 @@ setTimeout(() => {
 
 When a Fiber task fails, you can control the behavior of the `Fibers` instance by returning one of the following strategies from your error handler:
 
-- **`default`**: The `for await...of` loop throws the original exception. Note that queued fiber tasks may continue to run in the background.
+- **`default`**: The `for await...of` loop throws the original exception. Remaining tasks in the queue are dropped, but already running tasks may continue to run.
 - **`skip`**: The failed fiber task is skipped, and the `Fibers` instance continues with the next task without throwing an exception.
 - **`stop`**: The `Fibers` instance stops immediately, preventing new tasks from being queued. Already running tasks may continue to run. Note that the `for await...of` loop finishes successfully.
 
