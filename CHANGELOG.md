@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.4](https://github.com/sator-imaging/ts-fibers/compare/v0.5.3...v0.5.4) (2026-05-02)
+
+
+### Bug Fixes
+
+* release-please ([8d3673d](https://github.com/sator-imaging/ts-fibers/commit/8d3673d4c679db74454c3afaf72ad2f558d32d6b))
+
 ## [0.5.3](https://github.com/sator-imaging/ts-fibers/compare/v0.5.2...v0.5.3) (2026-05-02)
 
 
