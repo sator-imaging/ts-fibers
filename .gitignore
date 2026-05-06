@@ -13,6 +13,7 @@
 !README*.md
 !LICENSE.md
 !CHANGELOG.md
+!DOC_COVERAGE.md
 
 !package*.json
 !rollup.config.js
