@@ -53,7 +53,6 @@ on:
       # Backward compatibility
       auto-bump-version:
         type: string
-        default: ''
 
 jobs:
   main:
