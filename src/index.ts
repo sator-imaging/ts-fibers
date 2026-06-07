@@ -1,8 +1,27 @@
+/**
+ * Represents a factory that creates a promise-based task from a source value.
+ * @template TSource The type of the source data.
+ * @template TPromise The type of the value resolved by the task's promise.
+ */
 export interface FiberTaskFactory<TSource, TPromise> {
+  /** The source data used to create the task. */
   readonly source: TSource;
+  /** A factory function that takes the source and returns a promise. */
   readonly factory: (source: TSource) => Promise<TPromise>;
 }
 
+/**
+ * A callback function to handle errors occurred during fiber task execution.
+ * @template TSource The type of the source data.
+ * @template TValue The type of the value resolved by the task's promise.
+ * @param e The error that occurred.
+ * @param fibers The Fibers instance where the error occurred.
+ * @param reason The reason for the error. 'next' if it occurred during iteration, 'unknown' otherwise.
+ * @returns A strategy for handling the error:
+ * - 'stop': Ends the iteration successfully. Already running tasks may continue.
+ * - 'skip': Ignores the error and continues with the next task.
+ * - 'default': Re-throws the original exception and drops queued tasks.
+ */
 export type FiberErrorHandler<TSource, TValue> = (
   e: any,
   fibers: Fibers<TSource, TValue>,
@@ -10,6 +29,9 @@ export type FiberErrorHandler<TSource, TValue> = (
 ) =>
   'stop' | 'skip' | 'default';
 
+/**
+ * Custom error class for Fiber-related errors.
+ */
 export class FiberError extends Error {
   constructor(message: string) {
     super(message);
@@ -17,19 +39,16 @@ export class FiberError extends Error {
   }
 }
 
-/*
-  TODO: make Fibers thenable(awaitable) by adding then() method
-        --> `await fibers` to start fibers automatically before returning promise
-        --> obsolete .promiseStart property (mark with deprecated tag)
-
-  then<TResult1 = T, TResult2 = never>(
-    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
-    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
-  ): Promise<TResult1 | TResult2>;
-
-  * no change introduced since first available: lib.es2015.promise.d.ts
-
-*/
+/**
+ * A coroutine and microthreading library for TypeScript designed to manage
+ * asynchronous operations and background tasks efficiently.
+ *
+ * Fibers allows you to control concurrency, handle errors gracefully,
+ * and track the lifecycle of a set of asynchronous tasks.
+ *
+ * @template TSource The type of the source data for each task.
+ * @template TValue The type of the value resolved by each task's promise.
+ */
 export class Fibers<TSource, TValue>
   // error even if code is valid...? --> // extends Promise<void>
   implements AsyncGenerator<TValue> {
@@ -72,21 +91,23 @@ export class Fibers<TSource, TValue>
   }
 
   /**
-   * @description
-   * This property can be used for any purpose you desired.
-   * (ex. set identifier for tracking fibers that running in background)
+   * User-defined state associated with this Fibers instance.
+   * Useful for tracking or identifying fibers, especially when running in the background.
    */
   public state: unknown;
 
   /**
-   * @description
-   * DO NOT forget to call `start()` before `await` to avoid indefinite loop.
+   * A promise that resolves when all tasks in the Fibers instance have completed,
+   * or rejects if an error occurs and the error handler strategy is 'default'.
+   *
+   * @note DO NOT forget to call `start()` before `await`ing this promise to avoid indefinite waiting
+   * if you are not iterating over the fibers with `for await...of`.
    */
   public get promise(): Promise<void> { return this._fibersPromise; }
 
   /**
-   * @description
-   * Automatically invoke `start()` before getting value.
+   * A promise that automatically invokes `start()` before returning.
+   * Use this as a fail-safe to avoid indefinite loops when awaiting the lifecycle promise.
    */
   public get promiseStart(): Promise<void> {
     this.start();
@@ -94,6 +115,11 @@ export class Fibers<TSource, TValue>
   }
 
   private b_concurrency: number = 1;
+  /**
+   * The maximum number of tasks that can run concurrently.
+   * This value can be updated dynamically during execution.
+   * @throws {FiberError} If the value is less than or equal to 0.
+   */
   public get concurrency(): number { return this.b_concurrency; }
   public set concurrency(value: number) {
     if (value <= 0) {
@@ -103,12 +129,19 @@ export class Fibers<TSource, TValue>
   };
 
   private b_errorHandler: FiberErrorHandler<TSource, TValue> | undefined;
+  /**
+   * Registers a custom error handler to control how the Fibers instance behaves when a task fails.
+   * @param handler The error handler function, or `undefined` to use the default behavior.
+   */
   public setErrorHandler(handler: FiberErrorHandler<TSource, TValue> | undefined): void {
     this.b_errorHandler = handler;
   }
 
+  /** Returns `true` if the Fibers instance encountered an unhandled error and stopped. */
   public get failed(): boolean { return this._isFailed; };
+  /** Returns `true` if the Fibers instance is currently running tasks in the background. */
   public get started(): boolean { return this._activeBackgroundJob !== undefined; };
+  /** Returns `true` if all tasks have been processed (successfully or otherwise). */
   public get completed(): boolean { return this._isCompleted; };
 
   private async _runInBackground(): Promise<void> {
@@ -127,6 +160,12 @@ export class Fibers<TSource, TValue>
     }
   }
 
+  /**
+   * Starts processing fiber tasks in the background.
+   *
+   * @returns A promise that resolves when all tasks are completed or the fibers are stopped.
+   * @throws {FiberError} If called while the Fibers instance is being iterated over with `for await...of`.
+   */
   public start(): Promise<void> {
     if (this._isGeneratorConsuming) {
       throw new FiberError("Cannot start while iterating over fibers");
@@ -144,6 +183,12 @@ export class Fibers<TSource, TValue>
     return (((this._activeBackgroundJob = this._runInBackground())));
   }
 
+  /**
+   * Signals the Fibers instance to stop queueing new tasks.
+   * Already running tasks will continue to execute.
+   *
+   * @returns A promise that resolves when the background process has finished.
+   */
   public stop(): Promise<void> {
     this._allowBackgroundJobRunning = false;
 
@@ -332,6 +377,17 @@ export class Fibers<TSource, TValue>
     }
   }
 
+  /**
+   * Creates a Fibers instance that executes tasks based on a range of numbers.
+   *
+   * @template TResult The type of the value resolved by the task's promise.
+   * @param concurrency The maximum number of concurrent tasks.
+   * @param start The starting index (inclusive).
+   * @param end The ending index (exclusive).
+   * @param step The increment between indices.
+   * @param factory A function that takes the current index and returns a promise for the task.
+   * @returns A new Fibers instance.
+   */
   public static for<TResult>(
     concurrency: number,
     start: number,
@@ -348,6 +404,16 @@ export class Fibers<TSource, TValue>
     );
   }
 
+  /**
+   * Creates a Fibers instance that executes tasks for each item in an iterable.
+   *
+   * @template TSource The type of the source data.
+   * @template TResult The type of the value resolved by the task's promise.
+   * @param concurrency The maximum number of concurrent tasks.
+   * @param items An iterable collection of source data.
+   * @param factory A function that takes an item and returns a promise for the task.
+   * @returns A new Fibers instance.
+   */
   public static forEach<TSource, TResult>(
     concurrency: number,
     items: Iterable<TSource>,
@@ -374,6 +440,13 @@ export class Fibers<TSource, TValue>
     }
   }
 
+  /**
+   * Returns a promise that resolves after a specified delay.
+   *
+   * @param milliseconds The delay in milliseconds.
+   * @param ac (Optional) An AbortController to cancel the delay.
+   * @returns A promise that resolves when the delay has passed or rejects if aborted.
+   */
   public static delay(milliseconds: number, ac?: AbortController): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (ac?.signal.aborted) {
@@ -399,6 +472,12 @@ export class Fibers<TSource, TValue>
     });
   }
 
+  /**
+   * Creates an AbortController that automatically aborts after a specified timeout.
+   *
+   * @param milliseconds The timeout in milliseconds.
+   * @returns An AbortController instance.
+   */
   public static timeout(milliseconds: number): AbortController {
     const ac = new AbortController();
     Fibers.delay(milliseconds, ac).then(() => ac.abort(), Fibers.emptyFunction);
