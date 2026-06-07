@@ -398,4 +398,10 @@ export class Fibers<TSource, TValue>
       ac?.signal.addEventListener('abort', onAbort);
     });
   }
+
+  public static timeout(milliseconds: number): AbortController {
+    const ac = new AbortController();
+    Fibers.delay(milliseconds, ac).then(() => ac.abort(), Fibers.emptyFunction);
+    return ac;
+  }
 }

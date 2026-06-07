@@ -41,6 +41,32 @@ describe('Fibers.delay', () => {
   });
 });
 
+describe('Fibers.timeout', () => {
+  it('should abort after the specified milliseconds', async () => {
+    vi.useFakeTimers();
+    const ac = Fibers.timeout(1000);
+    expect(ac.signal.aborted).toBe(false);
+    vi.advanceTimersByTime(1000);
+    // Fibers.delay resolves, then .then() calls ac.abort().
+    // We might need to wait for a microtask.
+    await Promise.resolve();
+    expect(ac.signal.aborted).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it('should be able to abort manually before timeout', async () => {
+    vi.useFakeTimers();
+    const ac = Fibers.timeout(1000);
+    expect(ac.signal.aborted).toBe(false);
+    vi.advanceTimersByTime(500);
+    ac.abort();
+    expect(ac.signal.aborted).toBe(true);
+    vi.advanceTimersByTime(500);
+    expect(ac.signal.aborted).toBe(true);
+    vi.useRealTimers();
+  });
+});
+
 describe('Fibers concurrency level validation', () => {
   it('should throw an error if concurrency level is 0 for Fibers.for', () => {
     const factory = async (index: number) => index;
