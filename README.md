@@ -235,7 +235,7 @@ for await (const result of fibers) {
 
 # ⏱️ `Fibers.delay`
 
-A simple helper method to wait for a specified number of milliseconds, similar to `setTimeout` but with `Promise` and `AbortController` integration.
+A simple helper method to wait for a specified number of milliseconds, similar to `setTimeout` but with `Promise` and `AbortSignal` integration.
 
 ```ts
 import { Fibers } from 'ts-fibers';
@@ -245,12 +245,12 @@ console.log('Waiting for 1 second...');
 await Fibers.delay(1000);
 console.log('1 second passed!');
 
-// Work with AbortController to cancel the delay
+// Work with AbortSignal to cancel the delay
 const ac = new AbortController();
 
 console.log('Starting a 5-second timer, but will abort after 1 second...');
 
-const timer = Fibers.delay(5000, ac);
+const timer = Fibers.delay(5000, ac.signal);
 timer.finally(() => console.log('finished or aborted'));
 
 setTimeout(() => {

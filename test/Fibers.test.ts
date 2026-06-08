@@ -13,14 +13,14 @@ describe('Fibers.delay', () => {
   it('should reject with AbortError if signal is already aborted', async () => {
     const abortController = new AbortController();
     abortController.abort();
-    const promise = Fibers.delay(1000, abortController);
+    const promise = Fibers.delay(1000, abortController.signal);
     await expect(promise).rejects.toHaveProperty('name', 'AbortError');
   });
 
   it('should reject with AbortError if signal is aborted during delay', async () => {
     vi.useFakeTimers();
     const abortController = new AbortController();
-    const promise = Fibers.delay(1000, abortController);
+    const promise = Fibers.delay(1000, abortController.signal);
     vi.advanceTimersByTime(50);
     abortController.abort();
     await expect(promise).rejects.toHaveProperty('name', 'AbortError');
@@ -31,7 +31,7 @@ describe('Fibers.delay', () => {
     vi.useFakeTimers();
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
     const abortController = new AbortController();
-    const promise = Fibers.delay(1000, abortController);
+    const promise = Fibers.delay(1000, abortController.signal);
     abortController.abort();
     expect(clearTimeoutSpy).toHaveBeenCalled();
     clearTimeoutSpy.mockRestore();
