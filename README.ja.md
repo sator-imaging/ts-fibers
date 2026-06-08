@@ -290,24 +290,6 @@ try {
 ```
 
 
-## 中断不可能なタスクの処理
-
-`AbortController` をネイティブにサポートしていない API の場合は、アボートシグナルを手動で処理できます。
-
-```ts
-import { Fibers } from 'ts-fibers';
-
-const ac = Fibers.timeout(1000);
-
-// AbortController をサポートしていない API のタイムアウトを処理するためにシグナルを使用する
-const task = someNonAbortableTask();
-ac.signal.addEventListener('abort', () => {
-  task.stop(); // タスクを手動で停止する
-  console.log('Operation timed out and was manually stopped.');
-});
-```
-
-
 ## バックグラウンドタスクでの使用
 
 特定の条件または制限時間に達した場合に、Fibers インスタンス全体を停止するためにタイムアウトを使用できます。

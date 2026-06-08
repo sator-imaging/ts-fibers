@@ -290,24 +290,6 @@ try {
 ```
 
 
-## Handling Non-Abortable Tasks
-
-For APIs that do not natively support `AbortController`, you can manually handle the abort signal.
-
-```ts
-import { Fibers } from 'ts-fibers';
-
-const ac = Fibers.timeout(1000);
-
-// Use the signal to handle timeout for an API that doesn't support it
-const task = someNonAbortableTask();
-ac.signal.addEventListener('abort', () => {
-  task.stop(); // Manually stop the task
-  console.log('Operation timed out and was manually stopped.');
-});
-```
-
-
 ## Use with Background Tasks
 
 You can use a timeout to stop the entire Fibers instance if a specific condition or time limit is met.

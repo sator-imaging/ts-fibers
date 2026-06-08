@@ -290,24 +290,6 @@ try {
 ```
 
 
-## 处理不可中止的任务
-
-对于不原生支持 `AbortController` 的 API，您可以手动处理中止信号。
-
-```ts
-import { Fibers } from 'ts-fibers';
-
-const ac = Fibers.timeout(1000);
-
-// 使用 signal 为不支持它的 API 处理超时
-const task = someNonAbortableTask();
-ac.signal.addEventListener('abort', () => {
-  task.stop(); // 手动停止任务
-  console.log('操作超时，已手动停止。');
-});
-```
-
-
 ## 在后台任务中使用
 
 如果满足特定条件或达到时间限制，您可以使用超时来停止整个 Fibers 实例。
