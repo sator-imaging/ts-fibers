@@ -343,10 +343,10 @@ const fibers = Fibers.forEach(5, urls, async (url) => {
 
 // 10-second timeout for the entire iteration
 const ac = Fibers.timeout(10000);
-ac.signal.addEventListener('abort', () => fibers.stop());
 
 try {
   for await (const result of fibers) {
+    if (ac.signal.aborted) break;
     console.log('Downloaded:', result);
   }
 } catch (e) {

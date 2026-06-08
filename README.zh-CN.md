@@ -343,10 +343,10 @@ const fibers = Fibers.forEach(5, urls, async (url) => {
 
 // 整个迭代过程的 10 秒超时
 const ac = Fibers.timeout(10000);
-ac.signal.addEventListener('abort', () => fibers.stop());
 
 try {
   for await (const result of fibers) {
+    if (ac.signal.aborted) break;
     console.log('已下载：', result);
   }
 } catch (e) {
