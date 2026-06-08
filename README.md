@@ -263,6 +263,74 @@ setTimeout(() => {
 
 
 
+# ⏱️ `Fibers.timeout`
+
+Creates an `AbortController` that automatically aborts after a specified number of milliseconds. This is useful for implementing timeouts in your Fiber tasks.
+
+
+## Basic Usage
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+// Create an AbortController that aborts after 1 second
+const ac = Fibers.timeout(1000);
+
+try {
+  // Use the signal in any API that supports it
+  await Fibers.delay(2000, ac.signal);
+} catch (e) {
+  console.log('Operation timed out!');
+}
+```
+
+
+## Use with Background Tasks
+
+You can set a timeout for each individual task within a Fiber set.
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  // Each download task has its own 5-second timeout
+  const ac = Fibers.timeout(5000);
+  return await downloadAsync(url, ac.signal);
+});
+
+fibers.start();
+```
+
+
+## Use with `for await...of`
+
+You can also use a single timeout to control the entire iteration process.
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+// 10-second timeout for the entire process
+const ac = Fibers.timeout(10000);
+
+try {
+  const fibers = Fibers.forEach(5, urls, async (url) => {
+    return await downloadAsync(url, ac.signal);
+  });
+
+  for await (const result of fibers) {
+    console.log('Downloaded:', result);
+  }
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.error('The entire process timed out!');
+  }
+}
+```
+
+
+
+
+
 # 🤝 Contributing
 
 We welcome contributions!
