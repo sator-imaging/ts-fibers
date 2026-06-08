@@ -278,7 +278,7 @@ const ac = Fibers.timeout(1000);
 
 try {
   // 在任何支持 signal 的 API 中使用它
-  await Fibers.delay(2000, ac.signal);
+  await Fibers.delay(2000, ac);
 } catch (e) {
   console.log('操作超时！');
 }

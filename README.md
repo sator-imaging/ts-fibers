@@ -278,7 +278,7 @@ const ac = Fibers.timeout(1000);
 
 try {
   // Use the signal in any API that supports it
-  await Fibers.delay(2000, ac.signal);
+  await Fibers.delay(2000, ac);
 } catch (e) {
   console.log('Operation timed out!');
 }

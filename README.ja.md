@@ -278,7 +278,7 @@ const ac = Fibers.timeout(1000);
 
 try {
   // アボートシグナルをサポートする任意のAPIで使用
-  await Fibers.delay(2000, ac.signal);
+  await Fibers.delay(2000, ac);
 } catch (e) {
   console.log('Operation timed out!');
 }
