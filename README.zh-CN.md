@@ -270,12 +270,33 @@ setTimeout(() => {
 
 ## 基本用法
 
-您可以使用 `AbortController` 手动处理任何操作的超时。
+您可以将 `AbortController` 与任何支持它的 API（如 `fetch`）一起使用。
 
 ```ts
 import { Fibers } from 'ts-fibers';
 
 // 创建一个在 1 秒后中止的 AbortController
+const ac = Fibers.timeout(1000);
+
+try {
+  // 在 fetch 中使用 signal
+  const response = await fetch('https://...', { signal: ac.signal });
+  const data = await response.json();
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.log('Fetch 请求超时！');
+  }
+}
+```
+
+
+## 处理不可中止的任务
+
+对于不原生支持 `AbortController` 的 API，您可以手动处理中止信号。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
 const ac = Fibers.timeout(1000);
 
 // 使用 signal 为不支持它的 API 处理超时

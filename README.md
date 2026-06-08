@@ -270,12 +270,33 @@ Creates an `AbortController` that automatically aborts after a specified number 
 
 ## Basic Usage
 
-You can use the `AbortController` to manually handle timeouts for any operation.
+You can use the `AbortController` with any API that supports it, such as `fetch`.
 
 ```ts
 import { Fibers } from 'ts-fibers';
 
 // Create an AbortController that aborts after 1 second
+const ac = Fibers.timeout(1000);
+
+try {
+  // Use the signal in fetch
+  const response = await fetch('https://...', { signal: ac.signal });
+  const data = await response.json();
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.log('Fetch request timed out!');
+  }
+}
+```
+
+
+## Handling Non-Abortable Tasks
+
+For APIs that do not natively support `AbortController`, you can manually handle the abort signal.
+
+```ts
+import { Fibers } from 'ts-fibers';
+
 const ac = Fibers.timeout(1000);
 
 // Use the signal to handle timeout for an API that doesn't support it

@@ -270,12 +270,33 @@ setTimeout(() => {
 
 ## 基本的な使用法
 
-`AbortController` を使用して、任意の操作のタイムアウトを手動で処理できます。
+`fetch` など、`AbortController` をサポートする任意の API で `AbortController` を使用できます。
 
 ```ts
 import { Fibers } from 'ts-fibers';
 
 // 1秒後にアボートする AbortController を作成
+const ac = Fibers.timeout(1000);
+
+try {
+  // fetch でシグナルを使用する
+  const response = await fetch('https://...', { signal: ac.signal });
+  const data = await response.json();
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.log('Fetch request timed out!');
+  }
+}
+```
+
+
+## 中断不可能なタスクの処理
+
+`AbortController` をネイティブにサポートしていない API の場合は、アボートシグナルを手動で処理できます。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
 const ac = Fibers.timeout(1000);
 
 // AbortController をサポートしていない API のタイムアウトを処理するためにシグナルを使用する
