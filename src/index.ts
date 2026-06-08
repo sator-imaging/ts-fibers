@@ -187,7 +187,7 @@ export class Fibers<TSource, TValue>
    * Signals the Fibers instance to stop queueing new tasks.
    * Already running tasks will continue to execute.
    *
-   * @returns A promise that resolves when the background process has finished.
+   * @returns A promise that resolves when the active background process has finished.
    */
   public stop(): Promise<void> {
     this._allowBackgroundJobRunning = false;
