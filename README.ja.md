@@ -265,10 +265,12 @@ setTimeout(() => {
 
 # ⏱️ `Fibers.timeout`
 
-指定されたミリ秒後に自動的にアボートする `AbortController` を作成します。これは、Fiberタスクにタイムアウトを実装する場合に便利です。
+指定されたミリ秒後に自動的にアボートする `AbortController` を作成します。これは、特に `AbortController` をネイティブにサポートしていない API を操作する場合に、Fiber タスクにタイムアウトを実装するのに役立ちます。
 
 
 ## 基本的な使用法
+
+`AbortController` を使用して、任意の操作のタイムアウトを手動で処理できます。
 
 ```ts
 import { Fibers } from 'ts-fibers';
@@ -276,26 +278,31 @@ import { Fibers } from 'ts-fibers';
 // 1秒後にアボートする AbortController を作成
 const ac = Fibers.timeout(1000);
 
-try {
-  // アボートシグナルをサポートする任意のAPIで使用
-  await Fibers.delay(2000, ac);
-} catch (e) {
-  console.log('Operation timed out!');
-}
+// AbortController をサポートしていない API のタイムアウトを処理するためにシグナルを使用する
+const task = someNonAbortableTask();
+ac.signal.addEventListener('abort', () => {
+  task.stop(); // タスクを手動で停止する
+  console.log('Operation timed out and was manually stopped.');
+});
 ```
 
 
 ## バックグラウンドタスクでの使用
 
-Fiberセット内の個々のタスクにタイムアウトを設定できます。
+特定の条件または制限時間に達した場合に、Fibers インスタンス全体を停止するためにタイムアウトを使用できます。
 
 ```ts
 import { Fibers } from 'ts-fibers';
 
 const fibers = Fibers.forEach(5, urls, async (url) => {
-  // 各ダウンロードタスクに5秒のタイムアウトを設定
-  const ac = Fibers.timeout(5000);
-  return await downloadAsync(url, ac.signal);
+  return await downloadAsync(url);
+});
+
+// 30秒後にすべてのバックグラウンドタスクを停止する
+const ac = Fibers.timeout(30000);
+ac.signal.addEventListener('abort', () => {
+  console.log('Fibers exceeded 30s limit, stopping...');
+  fibers.stop();
 });
 
 fibers.start();
@@ -304,26 +311,25 @@ fibers.start();
 
 ## `for await...of` での使用
 
-イテレーションプロセス全体を制御するために、単一のタイムアウトを使用することもできます。
+同様に、イテレーションプロセスの期間を制御できます。
 
 ```ts
 import { Fibers } from 'ts-fibers';
 
-// プロセス全体に対して10秒のタイムアウト
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  return await downloadAsync(url);
+});
+
+// イテレーション全体に対して10秒のタイムアウト
 const ac = Fibers.timeout(10000);
+ac.signal.addEventListener('abort', () => fibers.stop());
 
 try {
-  const fibers = Fibers.forEach(5, urls, async (url) => {
-    return await downloadAsync(url, ac.signal);
-  });
-
   for await (const result of fibers) {
     console.log('Downloaded:', result);
   }
 } catch (e) {
-  if (e.name === 'AbortError') {
-    console.error('The entire process timed out!');
-  }
+  // 必要に応じてエラーを処理する
 }
 ```
 
