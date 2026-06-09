@@ -328,8 +328,8 @@ const ac = Fibers.timeout(10000);
 
 try {
   for await (const result of fibers) {
-    if (ac.signal.aborted) break;
     console.log('Downloaded:', result);
+    if (ac.signal.aborted) break;
   }
 } catch (e) {
   // 必要に応じてエラーを処理する
