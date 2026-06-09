@@ -444,12 +444,12 @@ export class Fibers<TSource, TValue>
    * Returns a promise that resolves after a specified delay.
    *
    * @param milliseconds The delay in milliseconds.
-   * @param ac (Optional) An AbortController to cancel the delay.
+   * @param signal (Optional) An AbortSignal to cancel the delay.
    * @returns A promise that resolves when the delay has passed or rejects if aborted.
    */
-  public static delay(milliseconds: number, ac?: AbortController): Promise<void> {
+  public static delay(milliseconds: number, signal?: AbortSignal): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      if (ac?.signal.aborted) {
+      if (signal?.aborted) {
         return reject(this._createAbortError());
       }
 
@@ -465,10 +465,10 @@ export class Fibers<TSource, TValue>
 
       const cleanup = () => {
         clearTimeout(timeoutId);
-        ac?.signal.removeEventListener('abort', onAbort);
+        signal?.removeEventListener('abort', onAbort);
       };
 
-      ac?.signal.addEventListener('abort', onAbort);
+      signal?.addEventListener('abort', onAbort);
     });
   }
 
@@ -480,7 +480,7 @@ export class Fibers<TSource, TValue>
    */
   public static timeout(milliseconds: number): AbortController {
     const ac = new AbortController();
-    Fibers.delay(milliseconds, ac).then(() => ac.abort(), Fibers.emptyFunction);
+    Fibers.delay(milliseconds, ac.signal).then(() => ac.abort(), Fibers.emptyFunction);
     return ac;
   }
 }

@@ -235,7 +235,7 @@ for await (const result of fibers) {
 
 # ⏱️ `Fibers.delay`
 
-一个简单的辅助方法，用于等待指定的毫秒数，类似于 `setTimeout`，但集成了 `Promise` 和 `AbortController`。
+一个简单的辅助方法，用于等待指定的毫秒数，类似于 `setTimeout`，但集成了 `Promise` 和 `AbortSignal`。
 
 ```ts
 import { Fibers } from 'ts-fibers';
@@ -245,12 +245,12 @@ console.log('等待 1 秒...');
 await Fibers.delay(1000);
 console.log('1 秒过去了！');
 
-// 使用 AbortController 取消延迟
+// 使用 AbortSignal 取消延迟
 const ac = new AbortController();
 
 console.log('启动一个 5 秒计时器，但会在 1 秒后中止...');
 
-const timer = Fibers.delay(5000, ac);
+const timer = Fibers.delay(5000, ac.signal);
 timer.finally(() => console.log('已完成或已中止'));
 
 setTimeout(() => {
