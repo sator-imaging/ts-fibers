@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0](https://github.com/sator-imaging/ts-fibers/releases/tag/v1.0.0) (2026-06-09)
+
+### 📣 Breaking Changes
+* feat!: Update `Fibers.delay` to take `AbortSignal` by [@google-labs-jules](https://github.com/google-labs-jules)[bot] in [#22](https://github.com/sator-imaging/ts-fibers/pull/22)
+### 🚀 Features
+* Add `Fibers.timeout` helper by [@google-labs-jules](https://github.com/google-labs-jules)[bot] in [#19](https://github.com/sator-imaging/ts-fibers/pull/19)
+### 📖 Documentation
+* Add Fibers.timeout documentation to READMEs by [@google-labs-jules](https://github.com/google-labs-jules)[bot] in [#21](https://github.com/sator-imaging/ts-fibers/pull/21)
+### 📚 Other Changes
+* Add and update docstrings for TypeScript files by [@google-labs-jules](https://github.com/google-labs-jules)[bot] in [#20](https://github.com/sator-imaging/ts-fibers/pull/20)
+
+
+**Full Changelog**: https://github.com/sator-imaging/ts-fibers/compare/v0.5.3...v1.0.0
+
+
 ## [0.5.3](https://github.com/sator-imaging/ts-fibers/compare/v0.5.2...v0.5.3) (2026-05-02)
 
 
