@@ -263,6 +263,83 @@ setTimeout(() => {
 
 
 
+# ⏱️ `Fibers.timeout`
+
+Creates an `AbortController` that automatically aborts after a specified number of milliseconds. This is useful for implementing timeouts in your Fiber tasks, especially when working with APIs that do not natively support `AbortController`.
+
+
+## Basic Usage
+
+You can use the `AbortController` with any API that supports it, such as `fetch`.
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+// Create an AbortController that aborts after 1 second
+const ac = Fibers.timeout(1000);
+
+try {
+  // Use the signal in fetch
+  const response = await fetch('https://...', { signal: ac.signal });
+  const data = await response.json();
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.log('Fetch request timed out!');
+  }
+}
+```
+
+
+## Use with Background Tasks
+
+You can use a timeout to stop the entire Fibers instance if a specific condition or time limit is met.
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  return await downloadAsync(url);
+});
+
+// Stop all background tasks after 30 seconds
+const ac = Fibers.timeout(30000);
+ac.signal.addEventListener('abort', () => {
+  console.log('Fibers exceeded 30s limit, stopping...');
+  fibers.stop();
+});
+
+fibers.start();
+```
+
+
+## Use with `for await...of`
+
+Similarly, you can control the duration of an iteration process.
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  return await downloadAsync(url);
+});
+
+// 10-second timeout for the entire iteration
+const ac = Fibers.timeout(10000);
+
+try {
+  for await (const result of fibers) {
+    console.log('Downloaded:', result);
+    if (ac.signal.aborted) break;
+  }
+} catch (e) {
+  // Handle errors if necessary
+}
+```
+
+
+
+
+
 # 🤝 Contributing
 
 We welcome contributions!

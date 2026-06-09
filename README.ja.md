@@ -263,6 +263,83 @@ setTimeout(() => {
 
 
 
+# ⏱️ `Fibers.timeout`
+
+指定されたミリ秒後に自動的にアボートする `AbortController` を作成します。これは、特に `AbortController` をネイティブにサポートしていない API を操作する場合に、Fiber タスクにタイムアウトを実装するのに役立ちます。
+
+
+## 基本的な使用法
+
+`fetch` など、`AbortController` をサポートする任意の API で `AbortController` を使用できます。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+// 1秒後にアボートする AbortController を作成
+const ac = Fibers.timeout(1000);
+
+try {
+  // fetch でシグナルを使用する
+  const response = await fetch('https://...', { signal: ac.signal });
+  const data = await response.json();
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.log('Fetch request timed out!');
+  }
+}
+```
+
+
+## バックグラウンドタスクでの使用
+
+特定の条件または制限時間に達した場合に、Fibers インスタンス全体を停止するためにタイムアウトを使用できます。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  return await downloadAsync(url);
+});
+
+// 30秒後にすべてのバックグラウンドタスクを停止する
+const ac = Fibers.timeout(30000);
+ac.signal.addEventListener('abort', () => {
+  console.log('Fibers exceeded 30s limit, stopping...');
+  fibers.stop();
+});
+
+fibers.start();
+```
+
+
+## `for await...of` での使用
+
+同様に、イテレーションプロセスの期間を制御できます。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  return await downloadAsync(url);
+});
+
+// イテレーション全体に対して10秒のタイムアウト
+const ac = Fibers.timeout(10000);
+
+try {
+  for await (const result of fibers) {
+    console.log('Downloaded:', result);
+    if (ac.signal.aborted) break;
+  }
+} catch (e) {
+  // 必要に応じてエラーを処理する
+}
+```
+
+
+
+
+
 # 🤝 貢献
 
 貢献を歓迎します！

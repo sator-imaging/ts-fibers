@@ -263,6 +263,83 @@ setTimeout(() => {
 
 
 
+# ⏱️ `Fibers.timeout`
+
+创建一个在指定毫秒数后自动中止的 `AbortController`。这对于在 Fiber 任务中实现超时非常有用，特别是当处理不原生支持 `AbortController` 的 API 时。
+
+
+## 基本用法
+
+您可以将 `AbortController` 与任何支持它的 API（如 `fetch`）一起使用。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+// 创建一个在 1 秒后中止的 AbortController
+const ac = Fibers.timeout(1000);
+
+try {
+  // 在 fetch 中使用 signal
+  const response = await fetch('https://...', { signal: ac.signal });
+  const data = await response.json();
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.log('Fetch 请求超时！');
+  }
+}
+```
+
+
+## 在后台任务中使用
+
+如果满足特定条件或达到时间限制，您可以使用超时来停止整个 Fibers 实例。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  return await downloadAsync(url);
+});
+
+// 30 秒后停止所有后台任务
+const ac = Fibers.timeout(30000);
+ac.signal.addEventListener('abort', () => {
+  console.log('Fibers 超过 30 秒限制，正在停止...');
+  fibers.stop();
+});
+
+fibers.start();
+```
+
+
+## 与 `for await...of` 一起使用
+
+同样，您可以控制迭代过程的持续时间。
+
+```ts
+import { Fibers } from 'ts-fibers';
+
+const fibers = Fibers.forEach(5, urls, async (url) => {
+  return await downloadAsync(url);
+});
+
+// 整个迭代过程的 10 秒超时
+const ac = Fibers.timeout(10000);
+
+try {
+  for await (const result of fibers) {
+    console.log('已下载：', result);
+    if (ac.signal.aborted) break;
+  }
+} catch (e) {
+  // 如有必要，处理错误
+}
+```
+
+
+
+
+
 # 🤝 贡献
 
 我们欢迎贡献！
