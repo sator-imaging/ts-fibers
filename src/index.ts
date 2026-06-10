@@ -237,8 +237,11 @@ export class Fibers<TSource, TValue>
         // NOTE: 'for await...of' awaits the outer promise.
         //       but WON'T await internal promise so that here need to await the internal promise!
 
-        // first, just wait for task completion here
-        await Promise.race(runningPool);
+        // first, just wait for task completion here.
+        // use try-catch to avoid jumping to outer catch before identifying finished task.
+        try {
+          await Promise.race(runningPool);
+        } catch { /* handled below */ }
 
         // then, wait for finally event completion.
         while (finishedPool.size === 0) {
