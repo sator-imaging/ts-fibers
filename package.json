@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "ts-fibers",
   "description": "A powerful and efficient coroutine/microthreading library for TypeScript.",
   "type": "module",

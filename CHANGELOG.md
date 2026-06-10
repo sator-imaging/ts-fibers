@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/sator-imaging/ts-fibers/releases/tag/v1.0.1) (2026-06-10)
+
+### 🚀 Features
+* Fix concurrent error handling and add comprehensive tests by [@google-labs-jules](https://github.com/google-labs-jules)[bot] in [#24](https://github.com/sator-imaging/ts-fibers/pull/24)
+
+
+**Full Changelog**: https://github.com/sator-imaging/ts-fibers/compare/v1.0.0...v1.0.1
+
+
 ## [1.0.0](https://github.com/sator-imaging/ts-fibers/releases/tag/v1.0.0) (2026-06-09)
 
 ### 📣 Breaking Changes
