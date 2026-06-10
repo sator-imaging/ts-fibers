@@ -239,9 +239,13 @@ export class Fibers<TSource, TValue>
 
         // first, just wait for task completion here.
         // use try-catch to avoid jumping to outer catch before identifying finished task.
-        try {
+        if (this.b_errorHandler) {
+          try {
+            await Promise.race(runningPool);
+          } catch { /* handled below */ }
+        } else {
           await Promise.race(runningPool);
-        } catch { /* handled below */ }
+        }
 
         // then, wait for finally event completion.
         while (finishedPool.size === 0) {
