@@ -18,7 +18,7 @@ export interface FiberTaskFactory<TSource, TPromise> {
  * @param fibers The Fibers instance where the error occurred.
  * @param reason The reason for the error. 'next' if it occurred during iteration, 'unknown' otherwise.
  * @returns A strategy for handling the error:
- * - 'stop': Ends the iteration successfully. Already running tasks may continue.
+ * - 'stop': Marks the Fibers instance as failed and ends the iteration successfully (without throwing). Already running tasks may continue.
  * - 'skip': Ignores the error and continues with the next task.
  * - 'default': Re-throws the original exception and drops queued tasks.
  */
@@ -269,6 +269,7 @@ export class Fibers<TSource, TValue>
     catch (error) {
       switch (this.b_errorHandler?.(error, this, 'next')) {
         case 'stop':
+          this._isFailed = true;
           loopFinished = true;
           break;  // must return AFTER finally block.
         case 'skip':

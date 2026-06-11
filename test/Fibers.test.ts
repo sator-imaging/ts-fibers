@@ -452,7 +452,7 @@ describe('Fibers error handling', () => {
     // Expect tasks before the error to be processed, and no tasks after
     expect(processed).toEqual([0, 1]);
     expect(fibers.completed).toBe(true);
-    expect(fibers.failed).toBe(false);
+    expect(fibers.failed).toBe(true);
     expect(fibers.started).toBe(false);
 
     await finallyPromise;
