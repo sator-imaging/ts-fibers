@@ -229,7 +229,7 @@ export class Fibers<TSource, TValue>
         // DO NOT remove task from pool on finally event!
         // it may lost tracking unexpectedly!!
         newTask
-          .catch(Fibers.emptyFunction)  // This is required to suppress vitest! (no other way found by AI research on 2026-05-01)
+          .catch(Fibers.emptyFunction)  // This is required to suppress vitest! (no other way found by AI research on 2026-06-11)
           .finally(() => finishedPool.add(newTask));
       }
 
