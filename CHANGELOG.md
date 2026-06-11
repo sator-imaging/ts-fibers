@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.2](https://github.com/sator-imaging/ts-fibers/releases/tag/v1.0.2) (2026-06-11)
+
+### 📣 Breaking Changes
+* Set `failed` to `true` if `errorHandler` returns `stop` by [@google-labs-jules](https://github.com/google-labs-jules)[bot] in [#27](https://github.com/sator-imaging/ts-fibers/pull/27)
+### 📚 Other Changes
+* Remove Vitest hack and improve test error handling by [@google-labs-jules](https://github.com/google-labs-jules)[bot] in [#26](https://github.com/sator-imaging/ts-fibers/pull/26)
+
+
+**Full Changelog**: https://github.com/sator-imaging/ts-fibers/compare/v1.0.1...v1.0.2
+
+
 ## [1.0.1](https://github.com/sator-imaging/ts-fibers/releases/tag/v1.0.1) (2026-06-10)
 
 ### 🚀 Features
