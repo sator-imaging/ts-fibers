@@ -422,12 +422,16 @@ describe('Fibers.forEach', () => {
 describe('Fibers error handling', () => {
   it('should stop processing tasks when error handler returns "stop"', async () => {
     const processed: number[] = [];
-    const factory = async (index: number) => {
-      if (index === 2) {
-        throw new Error('Test error - stop');
-      }
-      processed.push(index);
-      return index;
+    const factory = (index: number) => {
+      const p = (async () => {
+        if (index === 2) {
+          throw new Error('Test error - stop');
+        }
+        processed.push(index);
+        return index;
+      })();
+      p.catch(() => { });
+      return p;
     };
 
     const mock = vi.fn();
@@ -461,12 +465,16 @@ describe('Fibers error handling', () => {
 
   it('should skip erroneous tasks when error handler returns "skip"', async () => {
     const processed: number[] = [];
-    const factory = async (index: number) => {
-      if (index === 2) {
-        throw new Error('Test error - skip');
-      }
-      processed.push(index);
-      return index;
+    const factory = (index: number) => {
+      const p = (async () => {
+        if (index === 2) {
+          throw new Error('Test error - skip');
+        }
+        processed.push(index);
+        return index;
+      })();
+      p.catch(() => { });
+      return p;
     };
 
     const mock = vi.fn();
@@ -500,12 +508,16 @@ describe('Fibers error handling', () => {
 
   it('should re-throw error and mark fibers as failed when error handler returns "default" or is not set', async () => {
     const processed: number[] = [];
-    const factory = async (index: number) => {
-      if (index === 2) {
-        throw new Error('Test error - default');
-      }
-      processed.push(index);
-      return index;
+    const factory = (index: number) => {
+      const p = (async () => {
+        if (index === 2) {
+          throw new Error('Test error - default');
+        }
+        processed.push(index);
+        return index;
+      })();
+      p.catch(() => { });
+      return p;
     };
 
     const mock = vi.fn();
@@ -548,12 +560,16 @@ describe('Fibers error handling', () => {
 
   it('should re-throw error and mark fibers as failed when no error handler is set', async () => {
     const processed: number[] = [];
-    const factory = async (index: number) => {
-      if (index === 2) {
-        throw new Error('Test error - no handler');
-      }
-      processed.push(index);
-      return index;
+    const factory = (index: number) => {
+      const p = (async () => {
+        if (index === 2) {
+          throw new Error('Test error - no handler');
+        }
+        processed.push(index);
+        return index;
+      })();
+      p.catch(() => { });
+      return p;
     };
 
     const mock = vi.fn();
