@@ -269,6 +269,7 @@ export class Fibers<TSource, TValue>
     catch (error) {
       switch (this.b_errorHandler?.(error, this, 'next')) {
         case 'stop':
+          this._isFailed = true;
           loopFinished = true;
           break;  // must return AFTER finally block.
         case 'skip':

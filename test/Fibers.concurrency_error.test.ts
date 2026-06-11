@@ -70,7 +70,7 @@ describe('Fibers concurrency and error handling', () => {
 
     expect(results.length).toBeLessThan(10);
     expect(fibers.completed).toBe(true);
-    expect(fibers.failed).toBe(false);
+    expect(fibers.failed).toBe(true);
   });
 
   it('should handle "skip" strategy with concurrency > 1 (Fibers.forEach)', async () => {
