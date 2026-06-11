@@ -66,7 +66,7 @@ describe('Fibers concurrency and error handling', () => {
     // Error handler returns 'stop'.
     // No more tasks should be pulled from generator (3, 4, ... won't start).
     // Already running tasks (0, 1) might continue and be yielded if they finish before/during next() calls.
-    // BUT in current implementation, if stop is returned, loopFinished = true, and it returns {done: true}.
+    // BUT in current implementation, if stop is returned, loopFinished = true, and it returns {done: true} and failed = true.
 
     expect(results.length).toBeLessThan(10);
     expect(fibers.completed).toBe(true);
