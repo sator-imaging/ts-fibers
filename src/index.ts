@@ -59,8 +59,6 @@ export class Fibers<TSource, TValue>
   private readonly _finishedTaskPool: Set<Promise<TValue>> = new Set();
 
   private readonly _enqueueTaskFinish = (task: Promise<TValue>) => {
-    // DO NOT remove task from pool on finally event!
-    // it may lost tracking unexpectedly!!
     task
       .catch(Fibers.emptyFunction)  // This is required to suppress vitest! (no other way found by AI research on 2026-06-11)
       .finally(() => this._finishedTaskPool.add(task));
@@ -233,6 +231,9 @@ export class Fibers<TSource, TValue>
         const newTask = activeTask;
 
         runningPool.add(newTask);
+
+        // DO NOT remove task from pool on finally event!
+        // it may lost tracking unexpectedly!!
         this._enqueueTaskFinish(newTask);
       }
 
