@@ -21,5 +21,8 @@ jobs:
           {
             echo
             echo '## `npm pack --dry-run`'
+            echo
+            echo '```'
             npm pack --dry-run
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY" 2>&1
